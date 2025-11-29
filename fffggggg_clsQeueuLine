@@ -1,0 +1,151 @@
+#pragma once
+#include <iostream>
+#include <queue>
+#include <stack>
+#include "clsData.h"
+#include "clsStr.h"
+using namespace std;
+
+class clsQeueuLine {
+
+    private:
+        string _name;
+        int _min;
+        int _count = 0;
+        int _serve = 0;
+
+        class clsLine {
+            private:
+                string _name;
+                string _data_time;
+                int _waiting_client;
+                int _waiting_time;
+
+            public:
+                clsLine(string name, int serve, int witing){
+                    clsData data;
+
+                    _name = name;
+                    _data_time = clsData::format(data, "dd/mm/yyyy") + " - " + clsData::format_time_now("hh:mm:ss");
+                    _waiting_client = serve;
+                    _waiting_time = witing;
+                }
+
+                string get_name(void){
+                    return _name;
+                }
+
+                string get_data_time(void){
+                    return _data_time;
+                }
+
+                int get_serve(void){
+                    return _waiting_client;
+                }
+
+                int get_witing(void){
+                    return _waiting_time;
+                }
+                
+                void print(void){
+                    cout << _name << endl;
+                    cout << _data_time << endl;
+                    cout << "Witing Clinet: " << _waiting_client << endl;
+                    cout << "Witing Time: " << _waiting_time << endl;
+                }
+        };
+
+        queue <clsLine> qu;
+
+    public:
+
+        clsQeueuLine(string name, int min){
+            _name = name;
+            _min = min;
+        }
+
+        void print(void){
+            cout << "=============================" << endl;
+            cout << "Queue Info" << endl;
+            cout << "=============================" << endl;
+            cout << "Perfix: " << _name << endl;
+            cout << "Total: " << _count << endl;
+            cout << "Served Clients: " << _serve << endl;
+            cout << "Wating Clients: " << _count - _serve << endl;
+            cout << "=============================" << endl;
+        }
+
+        void ticket(void){
+            string name = _name + to_string(_count + 1);
+            clsLine o(name, _count, _count * _min);
+            qu.push(o);
+            _count++;
+        }
+
+        void print_all_ticket(void){
+            queue <clsLine> temp_qu = qu;
+            cout << "Ticket" << endl;
+            while(!temp_qu.empty()){
+                cout << "_______________________________________" << endl;
+                temp_qu.front().print();
+                temp_qu.pop();
+                cout << "_______________________________________" << endl;
+            }
+        }
+
+
+        void print_ticket_RTL(void){
+            queue <clsLine> temp_qu = qu;
+            while(!temp_qu.empty()){
+                cout << temp_qu.front().get_name() << " <-- ";
+                temp_qu.pop();
+            }
+
+            cout << endl;
+        }
+        
+        void print_ticket_LTR(void){
+            stack <clsLine> temp_st;
+            
+            queue <clsLine> temp_qu = qu;
+            while(!temp_qu.empty()){
+                temp_st.push(temp_qu.front());
+                temp_qu.pop();
+            }
+
+            while(!temp_st.empty()){
+                cout << temp_st.top().get_name() << " --> ";
+                temp_st.pop();
+            }
+            cout << endl;
+
+        }
+
+
+        bool serve(void){
+            // if(_serve < _count){
+            if(!qu.empty()){
+                qu.pop();
+                _serve++;
+                return true;
+            }
+
+            return false;
+        }
+
+        int waiting_client(void){
+            return qu.size();
+        }
+
+        string who_is_next(void){
+            if(qu.empty()){
+                return "Empty";
+            }
+            return qu.front().get_name();
+        }
+
+        int count_served_client(void){
+            return _serve;
+        }
+
+};
